@@ -1,2 +1,2 @@
-# TEST1
-Testing how a repository works. Basic stuff but necessary, I guess...
+# A Collection of useful VBA Macro
+this small collection of even smaller project is both an experiment on how to use GitHub and an attempt to create a library of such tools
