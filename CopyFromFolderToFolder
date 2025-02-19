@@ -1,0 +1,65 @@
+Sub CopyFromFolderToFolder()
+    Dim fso As Object
+    Dim sourceFolder As String
+    Dim destinationFolder As String
+    Dim fileList As Range
+    Dim file As Range
+    Dim sourcePath As String
+    Dim destinationPath As String
+    Dim fldr As FileDialog
+    Dim sItem As String
+    Dim copiedCount As Long
+    
+    ' Filedialog window opens to select SOURCE
+    Set fldr = Application.FileDialog(msoFileDialogFolderPicker)
+    With fldr
+        .Title = "Select Source Folder"
+        .AllowMultiSelect = False
+        If .Show <> -1 Then Exit Sub
+        sItem = .SelectedItems(1)
+    End With
+    sourceFolder = sItem
+    
+    ' Filedialog window opens to select DESTINATION
+    Set fldr = Application.FileDialog(msoFileDialogFolderPicker)
+    With fldr
+        .Title = "Select Destination Folder"
+        .AllowMultiSelect = False
+        If .Show <> -1 Then Exit Sub
+        sItem = .SelectedItems(1)
+    End With
+    destinationFolder = sItem
+    
+    ' CELLS IN WORKSHEET "CopyFromFolderToFolder", from A2 down
+    Set fileList = ThisWorkbook.Sheets("CopyFromFolderToFolder").Range("A2", ThisWorkbook.Sheets("CopyFromFolderToFolder").Range("A2").End(xlDown))
+    
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    
+    ' counter initialization
+    copiedCount = 0
+    
+    For Each file In fileList
+        ' path
+        sourcePath = sourceFolder & "\" & file.Value
+        
+        ' verify if file exist
+        If fso.FileExists(sourcePath) Then
+            ' build a path
+            destinationPath = destinationFolder & "\" & file.Value
+            
+            ' copy
+            fso.CopyFile sourcePath, destinationPath, True ' true to overwrite already existing files with same name
+            copiedCount = copiedCount + 1
+        Else
+            ' if a file is missing, it writes "missing" in column B
+            file.Offset(0, 1).Value = "Missing"
+        End If
+    Next file
+    
+    ' cleaning
+    Set fso = Nothing
+    Set fldr = Nothing
+    
+    ' msgbox
+    MsgBox "Copy completed! " & copiedCount & " files copied successfully.", vbOKOnly, "Fine"
+End Sub
